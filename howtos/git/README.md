@@ -1,21 +1,23 @@
-# GIT README
-> A guide to git version control
-
-BRANCHES
-	git branch ( returns current branch )
-	git branch -a ( returns all branches )
-	git branch -r ( returns all remote brnaches )
-	git branch -b branch_name ( checks out new or existing branch )
-REMOTES
-	git remote ( see all remotes )
-	git remote -v ( shows the url of the git remotes )
-	git remote add [shortname] [url] ( add a remote repo )
-	git fetch [shortname] ( pull remote data down and sets it to master )
-	git remote rm [shortname] ( removes remote repo )
-	git remote rename [shortname] [new-name] (rename remote repo )
-	git remote show ( shows a ll remtoe repos )
-PUSHING
-	git push [remote-shortname] [branch-name] ( push to remote server)
+# Git
+A guide to git version control
+## Branches
+```sh
+git branch 	# ( returns current branch )
+git branch -a	# ( returns all branches )
+git branch -r 	# ( returns all remote brnaches )
+git branch -b branch_name # ( checks out new or existing branch )
+```
+## Remotes
+```sh
+git remote 	# ( see all remotes )
+git remote -v 	# ( shows the url of the git remotes )
+git remote add [shortname] [url] 	# ( add a remote repo )
+git fetch [shortname] 	# ( pull remote data down and sets it to master )
+git remote rm [shortname] # ( removes remote repo )
+git remote rename [shortname] [new-name] # (rename remote repo )
+git remote show # ( shows a ll remtoe repos )
+git push [remote-shortname] [branch-name] # ( push to remote server)
+```
 GIT BISECT
 	git bisect start
         git bisect bad       

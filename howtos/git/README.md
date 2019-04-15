@@ -11,6 +11,8 @@
 - [Git Log](#git-log)
 - [Git Cherry-pick](#git-cherry-pick)
 - [Git Hooks](#git-hooks)
+- [Git Submodule](#git-submodule)
+- [Git Reset](#git-reset)
 
 ## Branches
 ```sh
@@ -18,6 +20,8 @@ git branch 	# ( returns current branch )
 git branch -a	# ( returns all branches )
 git branch -r 	# ( returns all remote brnaches )
 git branch -b branch_name # ( checks out new or existing branch )
+git branch -r --no-merged
+git branch -m old_branch new_branch # ( Rename branch locally )    
 ```
 ## Remotes
 ```sh
@@ -79,6 +83,8 @@ git pull remote_name master
 git checkout -b branch_name
 # git push
 git push remote_name
+git push origin :old_branch                 # Delete the old branch    
+git push --set-upstream origin new_branch   # Push the new branch, set local branch to track the new remote
 ```
 ## Git Subtree
 ```sh
@@ -99,8 +105,9 @@ git cherry pick <commit hash>
 ```
 ## Git Hooks
 git hooks (post-receive)
-# vim /srv/<repo>.git/hooks/post-receive
-#!/bin/sh                                                                                                                          	
+```sh
+vim /srv/<repo>.git/hooks/post-receive
+#!/bin/sh
 while read oldrev newrev ref    
 do                                                                                                 
   echo "oldrev: $oldrev"   
@@ -135,13 +142,22 @@ do
     fi
   popd
 done
+```
+## Git Submodule
+.gitmodules file stores the base repository's submodules
+```sh
+[submodule "path-to-submodules/example-submodule-repo"]
+    path = path-to-submodules/example-submodule-repo
+    url = ssh://git@example_host.com:7999/ver/example-submodule-repo.git
+    ignore = dirty
+```
+```sh
+git submodule init
+git submodule update
+```
 
-git subdamin
-git branch -r --no-merged
-
-git branch -m old_branch new_branch         # Rename branch locally    
-git push origin :old_branch                 # Delete the old branch    
-git push --set-upstream origin new_branch   # Push the new branch, set local branch to track the new remote
-
+## Git Reset
+```sh
 git reset HEAD --hard
 git reset origin/master --hard
+```

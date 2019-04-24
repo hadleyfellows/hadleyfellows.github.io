@@ -2,6 +2,8 @@
 > Run applications by containers
 - [Installation](#installation)
 	- [Linux Installation](#linux-installation)
+		- [Debian Ubuntu Installation](#debian-ubuntu-installation)
+		- [Centos Fedora Installation](#centos-fedora-installation)
 	- [Mac Installation](#mac-installation)
 	- [Windows Installation](#windows-installation)
 - [.dockerignore](#.dockerignore)
@@ -11,63 +13,8 @@
 - [Docker Registry](#docker-registry)
 - [Dockerfile](#dockerfile)
 ## Installation
-
-
-Install
-windows - https://github.com/docker/toolbox/releases/tag/v1.12.5
-		- https://www.docker.com/products/docker-toolbox#/resources
-linux   - https://docs.docker.com/docker-for-windows/install/#download-docker-for-windows
-
-
-	DOCKER INSTALL
-		Install docker on ubuntu
-			https://docs.docker.com
-			- login as root
-			- service docker.io status
-			- apt-get update
-			- apt-get istall -y docker.io 
-			- service docker.io status
-			- docker -v 
-				docker client command asked docker daemon for the version
-			- docker version
-			- docker info
-				containers :
-				images :
-				
-			
-		DOCKER CENTOS
-
-			Install DOcker CE on Centos 7
-
-			https://docs.docker.com/install/linux/docker-ce/centos/
-
-			$ yum install --setopt=obsoletes=0 \
-			   docker-ce-17.03.2.ce-1.el7.centos.x86_64 \
-			   docker-ce-selinux-17.03.2.ce-1.el7.centos.noarch # on a new system with yum repo defined, forcing older version and ignoring obsoletes introduced by 17.06.0
-
-
-			docker-compose
-			sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-			sudo chmod +x /usr/local/bin/docker-compose
-			docker-compose --version
-
-			systemctl enable docker.service
-
-				...
-		Install docker on CentOS
-			- sudo su
-			- yum install docker
-			- systemctl status docker.service
-			- systemctl start docker.service
-			- docker -v
-			- docker version
-			- docker info
-	Updating Docker
-			- backup everything
-			- wget -qO- https://get.docker.com/gpg | apt-key add -
-			- echo deb http://get.docker.com/ubuntu docker main > /etc/apt/sources.list.d/docker.list
-			- apt-get install -y lxc-docker
-			- docker version
+### Linux Installation
+Links
 	BASIC CONFIG DOCKER CONTAINER
 			- needs root access
 				cat /etc/group
@@ -109,9 +56,62 @@ linux   - https://docs.docker.com/docker-for-windows/install/#download-docker-fo
 
 
 
-### Linux Installation
+
+#### Debian Ubuntu Installation
+https://docs.docker.com
+			- login as root
+			- service docker.io status
+			- apt-get update
+			- apt-get istall -y docker.io 
+			- service docker.io status
+			- docker -v 
+				docker client command asked docker daemon for the version
+			- docker version
+			- docker info
+				containers :
+				images :
+			
+#### Centos Fedora Installation
+Links
+- https://docs.docker.com/install/linux/docker-ce/centos/
+Install Docker
+```
+yum install --setopt=obsoletes=0 \
+   docker-ce-17.03.2.ce-1.el7.centos.x86_64 \
+   docker-ce-selinux-17.03.2.ce-1.el7.centos.noarch 
+# on a new system with yum repo defined, forcing older version and ignoring obsoletes introduced by 17.06.0
+# option 2
+sudo su
+yum install docker
+systemctl status docker.service
+systemctl start docker.service
+docker -v
+docker version
+docker info
+```
+Install Docker Compose
+```
+sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
+systemctl enable docker.service
+```
+Updating Docker
+```
+wget -qO- https://get.docker.com/gpg | apt-key add -
+echo deb http://get.docker.com/ubuntu docker main > /etc/apt/sources.list.d/docker.list
+apt-get install -y lxc-docker
+docker version
+```
 ### Mac Installation
 ### Windows Installation
+Links
+- https://github.com/docker/toolbox/releases/tag/v1.12.5
+- https://www.docker.com/products/docker-toolbox#/resources
+- https://docs.docker.com/docker-for-windows/install/#download-docker-for-windows
+
+
+
 DOCKER WINDOWS windows containers
 	Steps to resolve the trouble...
 

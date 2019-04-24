@@ -1,51 +1,23 @@
 # Docker
 > Run applications by containers
 - [Installation](#installation)
+	- [Linux Installation](#linux-installation)
+	- [Mac Installation](#mac-installation)
+	- [Windows Installation](#windows-installation)
 - [.dockerignore](#.dockerignore)
 - [Docker Commandline](#docker-commandline)
+- [Docker Compose](#docker-compose)
 - [Container Concepts](#container-concepts)
 - [Docker Registry](#docker-registry)
 - [Dockerfile](#dockerfile)
 ## Installation
-## .dockerignore
-## Docker Commandline
-## Container Concepts
-## Docker Registry
-## Dockerfile
 
-DOCKER README
 
 Install
 windows - https://github.com/docker/toolbox/releases/tag/v1.12.5
 		- https://www.docker.com/products/docker-toolbox#/resources
 linux   - https://docs.docker.com/docker-for-windows/install/#download-docker-for-windows
 
-REPO GUIDE
-https://hub.docker.com/explore/
-
-
-CONCEPTS
-	Containers vs. VMs
-		- VMS are full machines on a physical machine: app,os,hard disk
-		- containers share a linux kernel os,hard disk
-		"Kernel Namespaces"	- containers have  their own :
-				- pid (isolated process tree pid tree)
-				- net (network dedicated IP and IP ranges)
-				- mnt (mounted folders)
-				- user (container root users)
-				- cgroups (Control Groups)
-					- one cgroup to a contianer
-					- this allows us to limit bandwidth, cpu, disk space
-				- capabilities for security
-
-	DOCKER containers
-		- docker used to called dotCloud
-		- Solomon Hykes - main player in creating docker
-		- written in GoLang 
-		- licenced by apache?
-		- libcontainer replaces linux LXC
-			- libcontainer allows direct access to Linux Kernal
-			- libcontainer allows for cross-platform
 
 	DOCKER INSTALL
 		Install docker on ubuntu
@@ -61,6 +33,26 @@ CONCEPTS
 			- docker info
 				containers :
 				images :
+				
+			
+		DOCKER CENTOS
+
+			Install DOcker CE on Centos 7
+
+			https://docs.docker.com/install/linux/docker-ce/centos/
+
+			$ yum install --setopt=obsoletes=0 \
+			   docker-ce-17.03.2.ce-1.el7.centos.x86_64 \
+			   docker-ce-selinux-17.03.2.ce-1.el7.centos.noarch # on a new system with yum repo defined, forcing older version and ignoring obsoletes introduced by 17.06.0
+
+
+			docker-compose
+			sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+			sudo chmod +x /usr/local/bin/docker-compose
+			docker-compose --version
+
+			systemctl enable docker.service
+
 				...
 		Install docker on CentOS
 			- sudo su
@@ -87,30 +79,110 @@ CONCEPTS
 				netstat -tlp
 				test on centos machine
 					export DOCKER_HOST="tcp://<ip address>"
-					docker version			
-	REGISTRIES
-			DockerHub
-				- registered images or repos 
-				- the github of docker
-				registry.hub.docker.com
+					docker version		
+					
+			Files located:
+				/var/lib/docker/aufs/
+					/var/lib/docker/aufs/layers
+						- files with th image id as file name
+						- files contain ids of layer images they are built on
+						- the layered images are from high level to base level
+					/var/lib/docker/aufs/diff
+						- shows the top layer image's file structure
+						ex. 
+							bin
+							boot
+							home
+							lib
+							tmp
+							usr
+							var
+							...
+					/var/lib/docker/containers/
+						list all container images on the system
 
-	DOCKER IMAGES
-		Layer images
-			- called images as well
-			- each layer has unqiue ID
-			ex.
-				base ubuntu image
-				second layer nginx
-				top layer update layer
-				-----
-				all these make one image
-			union mounts
-				- shared file system 
-				- with multiple views
-				- only top layer is edittable
-			bootfs
-				- a layer image that only exists during boot of docker
-			commands
+			pid 1 
+				/bin/bash is the pid=1 
+				in linux pid=1 the init process
+				the init process is like the main class process that manages the other processes
+				though docker is made for one process per container we can run multiple processes or daemons
+
+
+
+### Linux Installation
+### Mac Installation
+### Windows Installation
+DOCKER WINDOWS windows containers
+	Steps to resolve the trouble...
+
+	Thanks to Julien Corioland
+	https://blogs.msdn.microsoft.com/jcorioland/2016/10/13/getting-started-with-windows-containers/
+	provides steps
+	article "Cloud Computing, Architecture, Containers and DevOps !"
+
+	On windows 10 in elevated PowerShell
+	Enable-WindowsOptionalFeature -Online -FeatureName containers -All
+	Check
+	Get-WindowsOptionalFeature -Online -FeatureName "Microsoft-Hyper-V"
+	and add if needed "Microsoft-Hyper-V"
+	In docker task bar options switch to using Windows containers.
+	Using Windows Task Manager end task for docker service -> start service
+	Thanks to author of next issue above for the detailed log and the comment by friism. Apparently in the default installation docker is trying to start Linux VM with 2GB of RAM and apparently my hardware configuration wasn't satisfactory to this requirement. I am not certain this will resolve all outstanding issues, but finally getting prompt "Docker is running" was a good starting point.
+
+
+
+
+
+	Install-PackageProvider ContainerImage -Force
+	Find-ContainerImage
+	Enable-WindowsOptionalFeature -Online -FeatureName Containers
+	Install-ContainerImage WindowsServerCore
+
+	CTRL PQ
+
+	https://github.com/OneGet/MicrosoftDockerProvider
+
+	https://blog.docker.com/2016/09/build-your-first-docker-windows-server-container/
+
+
+
+
+	https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon
+	https://docs.microsoft.com/en-us/virtualization/windowscontainers/quick-start/quick-start-images
+
+
+	try first:
+	http://blogs.recneps.net/category/Windows-Containers
+
+
+	Install-windowsFeature containers
+	Restart-Computer
+	https://aka.ms/tp5/b/dockerd
+	https://aka.ms/tp5/b/docker
+	copy to programfiles\docker
+	add to system path
+	dockerd --register-service
+	Start-Service docker
+	Get-Service docker
+	docker version
+	Install-PackageProvider ContainerImage -Force
+	Find-ContainerImage
+	Install-ContainerImage WindowsServerCore
+	Restart-Service docker
+	docker images
+	docker run -it windowsservercore cmd
+
+	https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon
+
+
+
+
+
+
+
+## .dockerignore
+## Docker Commandline
+commands
 				docker-machine ip
 				docker images 
 				docker images --tree
@@ -181,33 +253,190 @@ CONCEPTS
 					docker load -i /tmp/<id or tag>.tar (loads docker image)
 					docker rmi <image id> (remmoves image, but we cannot remove a running container)
 
+				Images build containers
+
+				cd to docker file
+					docker-compose build (burns the dvd image) --no-cache (choose to not cache)
+					docker-compose up (starts up container)
+					docker exec -it <container id> /bin/bash (access the image and execute commands)
+				docker image
+
+				docker images (lists all docker images in docker cache *** need to run docker build to register docker images)
+				docker run -it <docker image id> /bin/bash
 
 
-			Files located:
-				/var/lib/docker/aufs/
-					/var/lib/docker/aufs/layers
-						- files with th image id as file name
-						- files contain ids of layer images they are built on
-						- the layered images are from high level to base level
-					/var/lib/docker/aufs/diff
-						- shows the top layer image's file structure
-						ex. 
-							bin
-							boot
-							home
-							lib
-							tmp
-							usr
-							var
-							...
-					/var/lib/docker/containers/
-						list all container images on the system
 
-			pid 1 
-				/bin/bash is the pid=1 
-				in linux pid=1 the init process
-				the init process is like the main class process that manages the other processes
-				though docker is made for one process per container we can run multiple processes or daemons
+				reads from docker-compose.yml
+
+				docker-compose build
+				docker-compose up
+				docker-compose build node
+				docker run -it dids_node /bin/bash
+
+
+				docker network (learn more)
+				docker machine (learn more)
+				docker swarm   (learn more)
+				docker registry (Learn more) - like git bare repo
+
+				cd /c/home/dev/docker/dids; docker-compose build --no-cache node;
+
+
+				DOCKER DEEP DIVE
+
+
+				DOCKER copy
+					docker cp [OPTIONS] CONTAINER:SRC_PATH DEST_PATH|-
+					docker cp [OPTIONS] SRC_PATH|- CONTAINER:DEST_PATH
+
+				docker cp src/. mycontainer:/target
+				docker cp mycontainer:/src/. target
+
+
+
+					TAG IT AND BAG IT
+						docker tag ed94e1e75ab7 141.167.70.243:5000/fellowsh/tileserver:1.1	
+						docker push 141.167.70.243:5000/fellowsh/tileserver:1.1
+					RUN CONTAINER IMAGE TO RESTART ALWAYS
+					docker run --name jenkins_master -d -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts --restart=always
+
+
+
+				DOCKER TROUBLESHOOT
+					- build fails out of memory
+						docker rm $(docker ps -q -f 'status=exited')
+						docker rmi $(docker images -q -f "dangling=true")
+
+
+## Docker Compose
+
+
+					DOCKER COMPOSE
+								docker-compose build (burns the dvd image) --no-cache (choose to not cache)
+								docker-compose up (starts up container)
+								docker exec -it <container id> /bin/bash (access the image and execute commands)
+
+								reads from docker-compose.yml
+
+								docker-compose build
+								docker-compose up
+								docker-compose down
+								docker-compose build node
+								docker run -it dids_node /bin/bash
+								docker-compose logs
+
+
+
+
+## Container Concepts
+CONCEPTS
+Containers vs. VMs
+- VMS are full machines on a physical machine: app,os,hard disk
+- containers share a linux kernel os,hard disk
+"Kernel Namespaces"	- containers have  their own :
+- pid (isolated process tree pid tree)
+- net (network dedicated IP and IP ranges)
+- mnt (mounted folders)
+- user (container root users)
+- cgroups (Control Groups)
+- one cgroup to a contianer
+- this allows us to limit bandwidth, cpu, disk space
+- capabilities for security
+
+DOCKER containers
+- docker used to called dotCloud
+- Solomon Hykes - main player in creating docker
+- written in GoLang 
+- licenced by apache?
+- libcontainer replaces linux LXC
+- libcontainer allows direct access to Linux Kernal
+- libcontainer allows for cross-platform
+
+
+
+	DOCKER IMAGES
+		Layer images
+			- called images as well
+			- each layer has unqiue ID
+			ex.
+				base ubuntu image
+				second layer nginx
+				top layer update layer
+				-----
+				all these make one image
+			union mounts
+				- shared file system 
+				- with multiple views
+				- only top layer is edittable
+			bootfs
+				- a layer image that only exists during boot of docker
+			
+
+
+
+
+
+
+## Docker Registry
+REPO GUIDE
+https://hub.docker.com/explore/
+	
+			- initialize registry
+				docker run -d -p 5000:5000 registry				
+			
+			- push to private registry
+				docker tag <image id> host:5000/priv-test:1.1
+				docker push host:5000/priv-test:1.1
+
+			- pull from private registry
+				docker pull localhost:5000/priv-test:1.1
+				docker run -d hot:5000/priv-test
+				
+	REGISTRIES
+			DockerHub
+				- registered images or repos 
+				- the github of docker
+				registry.hub.docker.com
+
+		Registries (repo for docker images)
+			- Docker hub is a public registry /repo
+			- a registry / repo holds docker images
+			- push image to docker registry/repo
+				docker tag <iamge id> <repo name>
+				docker push <repo name>
+				<repo name> = fellows/example1
+				docker tag 2ui4ui5ij6667u fellows/example1
+				docker push fellows/example1
+
+				login and presto
+			- pull images from docker registry
+				docker pull <repo name>
+				<repo name> = fellows/example1
+				docker tag 2ui4ui5ij6667u fellows/example1
+				docker pull fellows/example1
+			- private registry
+				*** NOTE ***
+				* Ubuntu config
+					/etc/default/docker
+					DOCKER_OPTS="--insecure-registry host:5000"
+				* CentOS config
+				ExecStart=/usr/bin/docker -d $OPTIONS $DOCKER_STORAGE_OPTIONS --insecure-registry host:5000
+				
+				- initialize registry
+					docker run -d -p 5000:5000 registry				
+				
+				- push to private registry
+					docker tag <image id> host:5000/priv-test
+					docker push host:5000/priv-test
+
+				- pull from private registry
+					docker run -d hot:5000/priv-test
+
+
+
+
+
+## Dockerfile
 
 
 		Dockerfile
@@ -346,39 +575,19 @@ CONCEPTS
 
 
 
-		Registries (repo for docker images)
-			- Docker hub is a public registry /repo
-			- a registry / repo holds docker images
-			- push image to docker registry/repo
-				docker tag <iamge id> <repo name>
-				docker push <repo name>
-				<repo name> = fellows/example1
-				docker tag 2ui4ui5ij6667u fellows/example1
-				docker push fellows/example1
 
-				login and presto
-			- pull images from docker registry
-				docker pull <repo name>
-				<repo name> = fellows/example1
-				docker tag 2ui4ui5ij6667u fellows/example1
-				docker pull fellows/example1
-			- private registry
-				*** NOTE ***
-				* Ubuntu config
-					/etc/default/docker
-					DOCKER_OPTS="--insecure-registry host:5000"
-				* CentOS config
-				ExecStart=/usr/bin/docker -d $OPTIONS $DOCKER_STORAGE_OPTIONS --insecure-registry host:5000
-				
-				- initialize registry
-					docker run -d -p 5000:5000 registry				
-				
-				- push to private registry
-					docker tag <image id> host:5000/priv-test
-					docker push host:5000/priv-test
 
-				- pull from private registry
-					docker run -d hot:5000/priv-test
+
+
+
+
+
+
+
+
+------------------------------------
+
+
 
 		docker networks
 			1. look at the networking stack
@@ -478,61 +687,8 @@ CONCEPTS
 
 
 
-					DOCKER COMPOSE
-								docker-compose build (burns the dvd image) --no-cache (choose to not cache)
-								docker-compose up (starts up container)
-								docker exec -it <container id> /bin/bash (access the image and execute commands)
-
-								reads from docker-compose.yml
-
-								docker-compose build
-								docker-compose up
-								docker-compose down
-								docker-compose build node
-								docker run -it dids_node /bin/bash
-								docker-compose logs
 
 
-
-
-Images build containers
-
-cd to docker file
-	docker-compose build (burns the dvd image) --no-cache (choose to not cache)
-	docker-compose up (starts up container)
-	docker exec -it <container id> /bin/bash (access the image and execute commands)
-docker image
-
-docker images (lists all docker images in docker cache *** need to run docker build to register docker images)
-docker run -it <docker image id> /bin/bash
-
-
-
-reads from docker-compose.yml
-
-docker-compose build
-docker-compose up
-docker-compose build node
-docker run -it dids_node /bin/bash
-
-
-docker network (learn more)
-docker machine (learn more)
-docker swarm   (learn more)
-docker registry (Learn more) - like git bare repo
-
-cd /c/home/dev/docker/dids; docker-compose build --no-cache node;
-
-
-DOCKER DEEP DIVE
-
-
-DOCKER copy
-	docker cp [OPTIONS] CONTAINER:SRC_PATH DEST_PATH|-
-	docker cp [OPTIONS] SRC_PATH|- CONTAINER:DEST_PATH
-
-docker cp src/. mycontainer:/target
-docker cp mycontainer:/src/. target
 
 WINDOWS CONTAINERS 
 	APACHE
@@ -676,116 +832,11 @@ DOCKER REGISTRIES
 							docker-machine version : 0.6.0, build e27fb87
 							docker-machine driver : virtualbox
 			
-			- initialize registry
-				docker run -d -p 5000:5000 registry				
-			
-			- push to private registry
-				docker tag <image id> host:5000/priv-test:1.1
-				docker push host:5000/priv-test:1.1
-
-			- pull from private registry
-				docker pull localhost:5000/priv-test:1.1
-				docker run -d hot:5000/priv-test
-
-	TAG IT AND BAG IT
-		docker tag ed94e1e75ab7 141.167.70.243:5000/fellowsh/tileserver:1.1	
-		docker push 141.167.70.243:5000/fellowsh/tileserver:1.1
-	RUN CONTAINER IMAGE TO RESTART ALWAYS
-	docker run --name jenkins_master -d -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts --restart=always
-
-
-
-DOCKER TROUBLESHOOT
-	- build fails out of memory
-		docker rm $(docker ps -q -f 'status=exited')
-		docker rmi $(docker images -q -f "dangling=true")
 
 
 
 
 
-
-DOCKER WINDOWS
-
-Steps to resolve the trouble...
-
-Thanks to Julien Corioland
-https://blogs.msdn.microsoft.com/jcorioland/2016/10/13/getting-started-with-windows-containers/
-provides steps
-article "Cloud Computing, Architecture, Containers and DevOps !"
-
-On windows 10 in elevated PowerShell
-Enable-WindowsOptionalFeature -Online -FeatureName containers -All
-Check
-Get-WindowsOptionalFeature -Online -FeatureName "Microsoft-Hyper-V"
-and add if needed "Microsoft-Hyper-V"
-In docker task bar options switch to using Windows containers.
-Using Windows Task Manager end task for docker service -> start service
-Thanks to author of next issue above for the detailed log and the comment by friism. Apparently in the default installation docker is trying to start Linux VM with 2GB of RAM and apparently my hardware configuration wasn't satisfactory to this requirement. I am not certain this will resolve all outstanding issues, but finally getting prompt "Docker is running" was a good starting point.
-
-
-
-
-
-Install-PackageProvider ContainerImage -Force
-Find-ContainerImage
-Enable-WindowsOptionalFeature -Online -FeatureName Containers
-Install-ContainerImage WindowsServerCore
-
-CTRL PQ
-
-https://github.com/OneGet/MicrosoftDockerProvider
-
-https://blog.docker.com/2016/09/build-your-first-docker-windows-server-container/
-
-
-
-
-https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon
-https://docs.microsoft.com/en-us/virtualization/windowscontainers/quick-start/quick-start-images
-
-
-try first:
-http://blogs.recneps.net/category/Windows-Containers
-
-
-Install-windowsFeature containers
-Restart-Computer
-https://aka.ms/tp5/b/dockerd
-https://aka.ms/tp5/b/docker
-copy to programfiles\docker
-add to system path
-dockerd --register-service
-Start-Service docker
-Get-Service docker
-docker version
-Install-PackageProvider ContainerImage -Force
-Find-ContainerImage
-Install-ContainerImage WindowsServerCore
-Restart-Service docker
-docker images
-docker run -it windowsservercore cmd
-
-https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon
-
-
-DOCKER CENTOS
-
-Install DOcker CE on Centos 7
-
-https://docs.docker.com/install/linux/docker-ce/centos/
-
-$ yum install --setopt=obsoletes=0 \
-   docker-ce-17.03.2.ce-1.el7.centos.x86_64 \
-   docker-ce-selinux-17.03.2.ce-1.el7.centos.noarch # on a new system with yum repo defined, forcing older version and ignoring obsoletes introduced by 17.06.0
-
-
-docker-compose
-sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-docker-compose --version
-
-systemctl enable docker.service
 
 
   

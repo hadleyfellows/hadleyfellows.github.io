@@ -6,6 +6,7 @@
 		- [Centos Fedora Installation](#centos-fedora-installation)
 	- [Mac Installation](#mac-installation)
 	- [Windows Installation](#windows-installation)
+		- [Windows Containers](#windows-containers)
 - [.dockerignore](#.dockerignore)
 - [Docker Commandline](#docker-commandline)
 - [Docker Compose](#docker-compose)
@@ -15,66 +16,67 @@
 ## Installation
 ### Linux Installation
 Links
-	BASIC CONFIG DOCKER CONTAINER
-			- needs root access
-				cat /etc/group
-				sudo gpasswd -a <user> docker
-				logout thn logon
-				docker run -it ubuntu /bin/bash
-			- run docker service on network
-				docker -H <IP Address> -d &
-				netstat -tlp
-				test on centos machine
-					export DOCKER_HOST="tcp://<ip address>"
-					docker version		
-					
-			Files located:
-				/var/lib/docker/aufs/
-					/var/lib/docker/aufs/layers
-						- files with th image id as file name
-						- files contain ids of layer images they are built on
-						- the layered images are from high level to base level
-					/var/lib/docker/aufs/diff
-						- shows the top layer image's file structure
-						ex. 
-							bin
-							boot
-							home
-							lib
-							tmp
-							usr
-							var
-							...
-					/var/lib/docker/containers/
-						list all container images on the system
-
-			pid 1 
-				/bin/bash is the pid=1 
-				in linux pid=1 the init process
-				the init process is like the main class process that manages the other processes
-				though docker is made for one process per container we can run multiple processes or daemons
-
-
-
+Prereqs:
+1. Add root access
+2. Add user to docker group
+view groups:
+```
+cat /etc/group
+```
+Add user to group:
+```
+sudo gpasswd -a <user> docker
+logout thn logon
+docker run -it ubuntu /bin/bash
+```
+3. Run docker service on network:
+```
+docker -H <IP Address> -d &
+```
+4. Check status:
+```
+netstat -tlp
+export DOCKER_HOST="tcp://<ip address>"
+docker version		
+```
+File locations:
+/var/lib/docker/aufs/
+/var/lib/docker/aufs/layers
+	- files with th image id as file name
+	- files contain ids of layer images they are built on
+	- the layered images are from high level to base level
+/var/lib/docker/aufs/diff
+	- shows the top layer image's file structure
+/var/lib/docker/containers/
+	list all container images on the system
+Linux Process IDs:
+/bin/bash is the pid=1 
+in linux pid=1 the init process
+the init process is like the main class process that manages the other processes
+though docker is made for one process per container we can run multiple processes or daemons
 
 #### Debian Ubuntu Installation
-https://docs.docker.com
-			- login as root
-			- service docker.io status
-			- apt-get update
-			- apt-get istall -y docker.io 
-			- service docker.io status
-			- docker -v 
-				docker client command asked docker daemon for the version
-			- docker version
-			- docker info
-				containers :
-				images :
-			
+Links:
+- https://docs.docker.com
+Steps:
+```
+# login as root
+service docker.io status
+apt-get update
+apt-get istall -y docker.io 
+service docker.io status
+docker -v 
+# docker client command asked docker daemon for the version
+docker version
+docker info
+# containers :
+# images :
+```
+
 #### Centos Fedora Installation
-Links
+Links:
 - https://docs.docker.com/install/linux/docker-ce/centos/
-Install Docker
+Steps:
 ```
 yum install --setopt=obsoletes=0 \
    docker-ce-17.03.2.ce-1.el7.centos.x86_64 \
@@ -109,225 +111,191 @@ Links
 - https://github.com/docker/toolbox/releases/tag/v1.12.5
 - https://www.docker.com/products/docker-toolbox#/resources
 - https://docs.docker.com/docker-for-windows/install/#download-docker-for-windows
-
-
-
-DOCKER WINDOWS windows containers
-	Steps to resolve the trouble...
-
-	Thanks to Julien Corioland
-	https://blogs.msdn.microsoft.com/jcorioland/2016/10/13/getting-started-with-windows-containers/
-	provides steps
-	article "Cloud Computing, Architecture, Containers and DevOps !"
-
-	On windows 10 in elevated PowerShell
-	Enable-WindowsOptionalFeature -Online -FeatureName containers -All
-	Check
-	Get-WindowsOptionalFeature -Online -FeatureName "Microsoft-Hyper-V"
-	and add if needed "Microsoft-Hyper-V"
-	In docker task bar options switch to using Windows containers.
-	Using Windows Task Manager end task for docker service -> start service
-	Thanks to author of next issue above for the detailed log and the comment by friism. Apparently in the default installation docker is trying to start Linux VM with 2GB of RAM and apparently my hardware configuration wasn't satisfactory to this requirement. I am not certain this will resolve all outstanding issues, but finally getting prompt "Docker is running" was a good starting point.
-
-
-
-
-
-	Install-PackageProvider ContainerImage -Force
-	Find-ContainerImage
-	Enable-WindowsOptionalFeature -Online -FeatureName Containers
-	Install-ContainerImage WindowsServerCore
-
-	CTRL PQ
-
-	https://github.com/OneGet/MicrosoftDockerProvider
-
-	https://blog.docker.com/2016/09/build-your-first-docker-windows-server-container/
-
-
-
-
-	https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon
-	https://docs.microsoft.com/en-us/virtualization/windowscontainers/quick-start/quick-start-images
-
-
-	try first:
-	http://blogs.recneps.net/category/Windows-Containers
-
-
-	Install-windowsFeature containers
-	Restart-Computer
-	https://aka.ms/tp5/b/dockerd
-	https://aka.ms/tp5/b/docker
-	copy to programfiles\docker
-	add to system path
-	dockerd --register-service
-	Start-Service docker
-	Get-Service docker
-	docker version
-	Install-PackageProvider ContainerImage -Force
-	Find-ContainerImage
-	Install-ContainerImage WindowsServerCore
-	Restart-Service docker
-	docker images
-	docker run -it windowsservercore cmd
-
-	https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon
-
-
-
-
-
-
-
+#### Windows Containers
+Links
+- http://blogs.recneps.net/category/Windows-Containers
+- https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon
+- https://blogs.msdn.microsoft.com/jcorioland/2016/10/13/getting-started-with-windows-containers/
+- https://github.com/OneGet/MicrosoftDockerProvider
+- https://blog.docker.com/2016/09/build-your-first-docker-windows-server-container/
+- https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon
+- https://docs.microsoft.com/en-us/virtualization/windowscontainers/quick-start/quick-start-images
+Steps:
+Install Hyper-V
+```
+# On windows 10 in elevated PowerShell
+Enable-WindowsOptionalFeature -Online -FeatureName containers -All
+# Check
+Get-WindowsOptionalFeature -Online -FeatureName "Microsoft-Hyper-V"
+```
+Install windows containers
+```
+Install-PackageProvider ContainerImage -Force
+Find-ContainerImage
+Enable-WindowsOptionalFeature -Online -FeatureName Containers
+Install-ContainerImage WindowsServerCore
+```
+Install Docker option 1
+```
+Install-windowsFeature containers
+Restart-Computer
+https://aka.ms/tp5/b/dockerd
+https://aka.ms/tp5/b/docker
+copy to programfiles\docker
+add to system path
+dockerd --register-service
+Start-Service docker
+Get-Service docker
+docker version
+Install-PackageProvider ContainerImage -Force
+Find-ContainerImage
+Install-ContainerImage WindowsServerCore
+Restart-Service docker
+docker images
+docker run -it windowsservercore cmd
+```
+Troubleshoot:
+- If needed "Microsoft-Hyper-V"
+- In docker task bar options switch to using Windows containers.
+- Using Windows Task Manager end task for docker service -> start service
+- Default installation docker is trying to start Linux VM with 2GB of RAM and apparently my hardware configuration wasn't satisfactory to this requirement. I am not certain this will resolve all outstanding issues, but finally getting prompt "Docker is running" was a good starting point.
 ## .dockerignore
 ## Docker Commandline
-commands
-				docker-machine ip
-				docker images 
-				docker images --tree
-				docker info
+```
+docker-machine ip
+docker images 
+docker images --tree
+docker info
 
-				docker pull <image alias>  (pulls images from docker hub to store locally)
-				docker pull -a <image alias> 
+docker pull <image alias>  (pulls images from docker hub to store locally)
+docker pull -a <image alias> 
 
-				docker ps   (list of images currently running)
-				docker ps -a (all images ran in the past)
-				docker start <id or tag> (start the docker image)
-				docker attach <id or tag> (attach to a specific container)
-				docker top (shows top processes on image)
-				docker inspect <image id or tag> (shows hardware details)
+docker ps   (list of images currently running)
+docker ps -a (all images ran in the past)
+docker start <id or tag> (start the docker image)
+docker attach <id or tag> (attach to a specific container)
+docker top (shows top processes on image)
+docker inspect <image id or tag> (shows hardware details)
 
-				docker run ubuntu /bin/bash -c "echo 'cool content' > /tmp/cool-file"
-				docker run 
-					image tag or id : 
-						ubuntu (latest ubuntu)
-						ubuntu:14.04 (specific ubuntu version)
-					executable to run inside: /bin/bash 
-					command on boot: -c "echo 'cool content' > /tmp/cool-file"
-					run in background: -d
-					interactive allows us to log into the image: -it
-					control number of cpu shares:  --cpu-shares=256
-					control memory allocation: memory=1g^C
-					name the container --name=example1
+docker run ubuntu /bin/bash -c "echo 'cool content' > /tmp/cool-file"
+docker run 
+	image tag or id : 
+		ubuntu (latest ubuntu)
+		ubuntu:14.04 (specific ubuntu version)
+	executable to run inside: /bin/bash 
+	command on boot: -c "echo 'cool content' > /tmp/cool-file"
+	run in background: -d
+	interactive allows us to log into the image: -it
+	control number of cpu shares:  --cpu-shares=256
+	control memory allocation: memory=1g^C
+	name the container --name=example1
 
-				docker run -it ubuntu /bin/bash  (running docker in the foreground)
-					takes you into terminal on the ubuntu container
-					press CTRL+P+Q (detaches from the container)
-					docker stop <image id> (stops the docker image)
-					docker ps -l  (lists last run docker images)
-					docker rm <image id> (remmoves containers image, but we cannot remve a running container)
-					docker start <image id> (start the docker image)
-					docker attach <image id> (attach into docker image)
-					docker restart <image id> (restarts docker image)
-					docker top <image id> (shows the docker image processes from outside the container)
-						docker attach <image id>
-						ps -ef (shows processes from inside the docker container)
-					docker logs <image id> 
-						-f to stream the logs
-					docker inspect <image id> (a bunch of information on the image )
-						read from config.json and hsotConfig.json on our docker image
-						ie.
-						/var/lib/containers/<image id>/config.jon ..
-				ENTER THE DOCKER CONTAINER
-					nsenter
-						- namespace enter
-						- requires container pid (found from docker inspect <image id> | grep pid)
-						ex.
-							nsenter -m -u -n -p -i -t <pid> /bin/bash
-								- mount namespace
-								- uts namespace
-								- network namespace
-								- process namespace
-								- ipc namespace
-								- target namespace
-								- process id
-					docker-enter <image id> (enters the docker image)
-					docker exec -it <image id> /bin/bash 
-
-				
-				image managment 
-					docker commit <image id> <tag> (creaes a new dcoker image)
-					docker history <image id or tag>
-					docker save -o /tmp/<id or tag>.tar <id or tag> (saves image)
-					docker load -i /tmp/<id or tag>.tar (loads docker image)
-					docker rmi <image id> (remmoves image, but we cannot remove a running container)
-
-				Images build containers
-
-				cd to docker file
-					docker-compose build (burns the dvd image) --no-cache (choose to not cache)
-					docker-compose up (starts up container)
-					docker exec -it <container id> /bin/bash (access the image and execute commands)
-				docker image
-
-				docker images (lists all docker images in docker cache *** need to run docker build to register docker images)
-				docker run -it <docker image id> /bin/bash
+docker run -it ubuntu /bin/bash  (running docker in the foreground)
+	takes you into terminal on the ubuntu container
+	press CTRL+P+Q (detaches from the container)
+	docker stop <image id> (stops the docker image)
+	docker ps -l  (lists last run docker images)
+	docker rm <image id> (remmoves containers image, but we cannot remve a running container)
+docker start <image id> (start the docker image)
+docker attach <image id> (attach into docker image)
+docker restart <image id> (restarts docker image)
+docker top <image id> (shows the docker image processes from outside the container)
+	docker attach <image id>
+	ps -ef (shows processes from inside the docker container)
+docker logs <image id> 
+	-f to stream the logs
+docker inspect <image id> (a bunch of information on the image )
+	read from config.json and hsotConfig.json on our docker image
+	ie.
+	/var/lib/containers/<image id>/config.jon ..
+	
+ENTER THE DOCKER CONTAINER
+nsenter
+	- namespace enter
+	- requires container pid (found from docker inspect <image id> | grep pid)
+	ex.
+		nsenter -m -u -n -p -i -t <pid> /bin/bash
+			- mount namespace
+			- uts namespace
+			- network namespace
+			- process namespace
+			- ipc namespace
+			- target namespace
+			- process id
+docker-enter <image id> (enters the docker image)
+docker exec -it <image id> /bin/bash 
 
 
+image managment 
+docker commit <image id> <tag> (creaes a new dcoker image)
+docker history <image id or tag>
+docker save -o /tmp/<id or tag>.tar <id or tag> (saves image)
+docker load -i /tmp/<id or tag>.tar (loads docker image)
+docker rmi <image id> (remmoves image, but we cannot remove a running container)
 
-				reads from docker-compose.yml
+Images build containers
 
-				docker-compose build
-				docker-compose up
-				docker-compose build node
-				docker run -it dids_node /bin/bash
+cd to docker file
+docker-compose build (burns the dvd image) --no-cache (choose to not cache)
+docker-compose up (starts up container)
+docker exec -it <container id> /bin/bash (access the image and execute commands)
+docker image
 
-
-				docker network (learn more)
-				docker machine (learn more)
-				docker swarm   (learn more)
-				docker registry (Learn more) - like git bare repo
-
-				cd /c/home/dev/docker/dids; docker-compose build --no-cache node;
-
-
-				DOCKER DEEP DIVE
-
-
-				DOCKER copy
-					docker cp [OPTIONS] CONTAINER:SRC_PATH DEST_PATH|-
-					docker cp [OPTIONS] SRC_PATH|- CONTAINER:DEST_PATH
-
-				docker cp src/. mycontainer:/target
-				docker cp mycontainer:/src/. target
+docker images (lists all docker images in docker cache *** need to run docker build to register docker images)
+docker run -it <docker image id> /bin/bash
 
 
 
-					TAG IT AND BAG IT
-						docker tag ed94e1e75ab7 141.167.70.243:5000/fellowsh/tileserver:1.1	
-						docker push 141.167.70.243:5000/fellowsh/tileserver:1.1
-					RUN CONTAINER IMAGE TO RESTART ALWAYS
-					docker run --name jenkins_master -d -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts --restart=always
+reads from docker-compose.yml
+
+docker-compose build
+docker-compose up
+docker-compose build node
+docker run -it dids_node /bin/bash
+
+
+docker network (learn more)
+docker machine (learn more)
+docker swarm   (learn more)
+docker registry (Learn more) - like git bare repo
+
+cd /c/home/dev/docker/dids; docker-compose build --no-cache node;
+
+DOCKER copy
+docker cp [OPTIONS] CONTAINER:SRC_PATH DEST_PATH|-
+docker cp [OPTIONS] SRC_PATH|- CONTAINER:DEST_PATH
+
+docker cp src/. mycontainer:/target
+docker cp mycontainer:/src/. target
 
 
 
-				DOCKER TROUBLESHOOT
-					- build fails out of memory
-						docker rm $(docker ps -q -f 'status=exited')
-						docker rmi $(docker images -q -f "dangling=true")
+TAG IT AND BAG IT
+docker tag ed94e1e75ab7 141.167.70.243:5000/fellowsh/tileserver:1.1	
+docker push 141.167.70.243:5000/fellowsh/tileserver:1.1
+RUN CONTAINER IMAGE TO RESTART ALWAYS
+docker run --name jenkins_master -d -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts --restart=always
 
 
+
+DOCKER TROUBLESHOOT
+- build fails out of memory
+docker rm $(docker ps -q -f 'status=exited')
+docker rmi $(docker images -q -f "dangling=true")
+```
 ## Docker Compose
-
-
-					DOCKER COMPOSE
-								docker-compose build (burns the dvd image) --no-cache (choose to not cache)
-								docker-compose up (starts up container)
-								docker exec -it <container id> /bin/bash (access the image and execute commands)
-
-								reads from docker-compose.yml
-
-								docker-compose build
-								docker-compose up
-								docker-compose down
-								docker-compose build node
-								docker run -it dids_node /bin/bash
-								docker-compose logs
-
-
-
-
+```
+docker-compose build (burns the dvd image) --no-cache (choose to not cache)
+docker-compose up (starts up container)
+docker exec -it <container id> /bin/bash (access the image and execute commands)
+reads from docker-compose.yml
+docker-compose build
+docker-compose up
+docker-compose down
+docker-compose build node
+docker run -it dids_node /bin/bash
+docker-compose logs
+```
 ## Container Concepts
 CONCEPTS
 Containers vs. VMs
@@ -342,7 +310,6 @@ Containers vs. VMs
 - one cgroup to a contianer
 - this allows us to limit bandwidth, cpu, disk space
 - capabilities for security
-
 DOCKER containers
 - docker used to called dotCloud
 - Solomon Hykes - main player in creating docker
@@ -351,226 +318,210 @@ DOCKER containers
 - libcontainer replaces linux LXC
 - libcontainer allows direct access to Linux Kernal
 - libcontainer allows for cross-platform
-
-
-
-	DOCKER IMAGES
-		Layer images
-			- called images as well
-			- each layer has unqiue ID
-			ex.
-				base ubuntu image
-				second layer nginx
-				top layer update layer
-				-----
-				all these make one image
-			union mounts
-				- shared file system 
-				- with multiple views
-				- only top layer is edittable
-			bootfs
-				- a layer image that only exists during boot of docker
-			
-
-
-
-
-
-
+DOCKER IMAGES
+Layer images
+	- called images as well
+	- each layer has unqiue ID
+	ex.
+		base ubuntu image
+		second layer nginx
+		top layer update layer
+		-----
+		all these make one image
+	union mounts
+		- shared file system 
+		- with multiple views
+		- only top layer is edittable
+	bootfs
+		- a layer image that only exists during boot of docker
 ## Docker Registry
 REPO GUIDE
 https://hub.docker.com/explore/
-	
-			- initialize registry
-				docker run -d -p 5000:5000 registry				
-			
-			- push to private registry
-				docker tag <image id> host:5000/priv-test:1.1
-				docker push host:5000/priv-test:1.1
+- initialize registry
+	docker run -d -p 5000:5000 registry				
 
-			- pull from private registry
-				docker pull localhost:5000/priv-test:1.1
-				docker run -d hot:5000/priv-test
-				
-	REGISTRIES
-			DockerHub
-				- registered images or repos 
-				- the github of docker
-				registry.hub.docker.com
+- push to private registry
+	docker tag <image id> host:5000/priv-test:1.1
+	docker push host:5000/priv-test:1.1
 
-		Registries (repo for docker images)
-			- Docker hub is a public registry /repo
-			- a registry / repo holds docker images
-			- push image to docker registry/repo
-				docker tag <iamge id> <repo name>
-				docker push <repo name>
-				<repo name> = fellows/example1
-				docker tag 2ui4ui5ij6667u fellows/example1
-				docker push fellows/example1
+- pull from private registry
+	docker pull localhost:5000/priv-test:1.1
+	docker run -d hot:5000/priv-test
+DockerHub
+	- registered images or repos 
+	- the github of docker
+	registry.hub.docker.com
 
-				login and presto
-			- pull images from docker registry
-				docker pull <repo name>
-				<repo name> = fellows/example1
-				docker tag 2ui4ui5ij6667u fellows/example1
-				docker pull fellows/example1
-			- private registry
-				*** NOTE ***
-				* Ubuntu config
-					/etc/default/docker
-					DOCKER_OPTS="--insecure-registry host:5000"
-				* CentOS config
-				ExecStart=/usr/bin/docker -d $OPTIONS $DOCKER_STORAGE_OPTIONS --insecure-registry host:5000
-				
-				- initialize registry
-					docker run -d -p 5000:5000 registry				
-				
-				- push to private registry
-					docker tag <image id> host:5000/priv-test
-					docker push host:5000/priv-test
+Registries (repo for docker images)
+- Docker hub is a public registry /repo
+- a registry / repo holds docker images
+- push image to docker registry/repo
+	docker tag <iamge id> <repo name>
+	docker push <repo name>
+	<repo name> = fellows/example1
+	docker tag 2ui4ui5ij6667u fellows/example1
+	docker push fellows/example1
 
-				- pull from private registry
-					docker run -d hot:5000/priv-test
+	login and presto
+- pull images from docker registry
+	docker pull <repo name>
+	<repo name> = fellows/example1
+	docker tag 2ui4ui5ij6667u fellows/example1
+	docker pull fellows/example1
+- private registry
+	*** NOTE ***
+	* Ubuntu config
+		/etc/default/docker
+		DOCKER_OPTS="--insecure-registry host:5000"
+	* CentOS config
+	ExecStart=/usr/bin/docker -d $OPTIONS $DOCKER_STORAGE_OPTIONS --insecure-registry host:5000
+
+	- initialize registry
+		docker run -d -p 5000:5000 registry				
+
+	- push to private registry
+		docker tag <image id> host:5000/priv-test
+		docker push host:5000/priv-test
+
+	- pull from private registry
+		docker run -d hot:5000/priv-test
 
 
 
 
 
 ## Dockerfile
+- set of instructions onhow to build an image
+- when building a docker image from Dockerfile all files and directories will be included into the build
+- always start with FROM an image
+- MAINTAINER email address
+RUN
+	- every RUN creates a new layer in our docker image
+	- RUN is a build time command
+CMD
+	- CMD is a run-time command
+	- CMD only one command per Dockerfile
+	- CMD executes everytime the docker image starts
+	- can run shell form or array form ["echo","hello world"]
+ENTRYPOINT
+	- can use --entrypoint
+	- can't be overwritten at run time
+	- takes parameters from command line or CMD command and interret them at runtime
+	ex. 
+		FROM ubuntu:15.04 
+		MAINTAINER hadleysjobs@gmail.com
+		ADD example.tar.gz / 
+		RUN apt-get update
+		#RUN apt-get install -y nginx
+		#RUN apt-get install -y golang
+		CMD echo $var1
+		ENTRYPOINT ["echo"]
+	# This will echo any paramters passed in at
+	$ docker build -t="hw2" . 
+	$ docker run hw2 hellooooo there!
+	$ helloooooo there!
+	$ docker run -it hw2 /bin/bash
+	$ /bin/bash
+		FROM ubuntu:15.04
+		RUN apt-get update && apt-get install -y iputils-ping
+		ENTRYPOINT ["apache2ctl"]
+	$ docker build -t="web2" .
+	$ docker run -d -p 80:80 web2 -D FOREGROUND
 
-
-		Dockerfile
-			- set of instructions onhow to build an image
-			- when building a docker image from Dockerfile all files and directories will be included into the build
-			- always start with FROM an image
-			- MAINTAINER email address
-			RUN
-				- every RUN creates a new layer in our docker image
-				- RUN is a build time command
-			CMD
-				- CMD is a run-time command
-				- CMD only one command per Dockerfile
-				- CMD executes everytime the docker image starts
-				- can run shell form or array form ["echo","hello world"]
-			ENTRYPOINT
-				- can use --entrypoint
-				- can't be overwritten at run time
-				- takes parameters from command line or CMD command and interret them at runtime
-				ex. 
-					FROM ubuntu:15.04 
-					MAINTAINER hadleysjobs@gmail.com
-					ADD example.tar.gz / 
-					RUN apt-get update
-					#RUN apt-get install -y nginx
-					#RUN apt-get install -y golang
-					CMD echo $var1
-					ENTRYPOINT ["echo"]
-				# This will echo any paramters passed in at
-				$ docker build -t="hw2" . 
-				$ docker run hw2 hellooooo there!
-				$ helloooooo there!
-				$ docker run -it hw2 /bin/bash
-				$ /bin/bash
-					FROM ubuntu:15.04
-					RUN apt-get update && apt-get install -y iputils-ping
-					ENTRYPOINT ["apache2ctl"]
-				$ docker build -t="web2" .
-				$ docker run -d -p 80:80 web2 -D FOREGROUND
-
-			ENV
-			ENV    - ENV var1=hado var2=fellows
-				ex. 
-					FROM ubuntu:15.04 
-					RUN apt-get update && apt-get install -y iputils-ping apache2
-					ENV var1=ping var2=8.8.8.8
-					CMD $var1 $var2
-					ENTRYPOINT ["apache2ctl"]
-				$ docker build -t="hado1" .
-				$ docker run -it hado1 /bin/bash
-				will ping 8.8.8.8 non stop
-				docker logs -f hado1
-			Volumes
-				Allow for shared data between contaiers
-				$ docker run -it -v /test-vol --name=voltainer ubuntu:15.04 /bin/bash
-				$ docker inspect voltainer
-				$ docker run -it --volumes-from=voltainer ubuntu:15.04 /bin/bash
-				mount host folder to container folder
-				$ docker run -v /host_data_folder:/container_datafolder
-				Inside the docker file VOLUME /data will allow the container to use a /data folder on the host
-				Deleting volumes
-					$ docker rm -v <container>
+ENV
+ENV    - ENV var1=hado var2=fellows
+	ex. 
+		FROM ubuntu:15.04 
+		RUN apt-get update && apt-get install -y iputils-ping apache2
+		ENV var1=ping var2=8.8.8.8
+		CMD $var1 $var2
+		ENTRYPOINT ["apache2ctl"]
+	$ docker build -t="hado1" .
+	$ docker run -it hado1 /bin/bash
+	will ping 8.8.8.8 non stop
+	docker logs -f hado1
+Volumes
+	Allow for shared data between contaiers
+	$ docker run -it -v /test-vol --name=voltainer ubuntu:15.04 /bin/bash
+	$ docker inspect voltainer
+	$ docker run -it --volumes-from=voltainer ubuntu:15.04 /bin/bash
+	mount host folder to container folder
+	$ docker run -v /host_data_folder:/container_datafolder
+	Inside the docker file VOLUME /data will allow the container to use a /data folder on the host
+	Deleting volumes
+		$ docker rm -v <container>
 
 
 
 
-			Dockerfile commands
-				FROM   - FROM ubuntu:15.04
-				ADD    - ADD example.tar.gz /
-				RUN    - RUN apt-get install -y apache2
-				EXPOSE - EXPOSE 80
-				CMD    - CMD ["apache2ctl", "-D", "FOREGROUND"]
-					   - CMD "echo", "Ello World"
-				ENTRYPOINT - ENTRYPOINT ["apache2ctl"]
-				ENV    - ENV var1=hado var2=fellows
-				VOLUME - VOLUME /data
-				WORKDIR - location of files on docker machine
+Dockerfile commands
+	FROM   - FROM ubuntu:15.04
+	ADD    - ADD example.tar.gz /
+	RUN    - RUN apt-get install -y apache2
+	EXPOSE - EXPOSE 80
+	CMD    - CMD ["apache2ctl", "-D", "FOREGROUND"]
+		   - CMD "echo", "Ello World"
+	ENTRYPOINT - ENTRYPOINT ["apache2ctl"]
+	ENV    - ENV var1=hado var2=fellows
+	VOLUME - VOLUME /data
+	WORKDIR - location of files on docker machine
 
 
-			docker build -f node.dockerfile -t tageName .
-			docker history <image layer id>
-			docker info
-			docker images-tree
+docker build -f node.dockerfile -t tageName .
+docker history <image layer id>
+docker info
+docker images-tree
 
-			Ex. Dockerfile
-				#Ubuntu based Hello World container
-				FROM ubuntu:15.04 
-				MAINTAINER hadleysjobs@gmail.com
-				ADD example.tar.gz / 
-				RUN apt-get update
-				#RUN apt-get install -y nginx
-				#RUN apt-get install -y golang
-				CMD "echo","Hello World"
-
-
-				docker build -t helloworld:0.1 .
-					- the dot is the current directory
-					- -t is for tags
-
-			Ex. Dockerfile 2
-				#web server example
-				FROM ubuntu:15.04 
-				MAINTAINER hadleysjobs@gmail.com
-				# option 1
-					RUN apt-get update
-					RUN apt-get install -y apache2
-					RUN apt-get install -y apache2-utils
-					RUN apt-get install -y vim
-					RUN apt-get clean
-				
-				# option 2
-				RUN apt-get update \
-					&& apt-get install -y \
-					apache2 \
-					apache2-utils \
-					vim \
-					&& apt-get clean
-					&& rm -rf /var/lib/apt/lists* /tmp/* /var/tmp/*
-
-				EXPOSE 80
-				CMD ["apache2ctrl","-D","FOREGROUND"]
-
-				docker build --no-cache -t="webserver-small" .
-				docker histry webserver-small
-				docker run -d -p 80:80 webserver
-				docker stop webserver
+Ex. Dockerfile
+	#Ubuntu based Hello World container
+	FROM ubuntu:15.04 
+	MAINTAINER hadleysjobs@gmail.com
+	ADD example.tar.gz / 
+	RUN apt-get update
+	#RUN apt-get install -y nginx
+	#RUN apt-get install -y golang
+	CMD "echo","Hello World"
 
 
-			BuildCache
-				docker build -t="build1"
-				docker build -t="build2" (this happens faster because of build cache)
-				whats happing is that it is matching the layer images that it already has in its cache
+	docker build -t helloworld:0.1 .
+		- the dot is the current directory
+		- -t is for tags
 
-				docker build --no-cache -t="build with no cache"
+Ex. Dockerfile 2
+	#web server example
+	FROM ubuntu:15.04 
+	MAINTAINER hadleysjobs@gmail.com
+	# option 1
+		RUN apt-get update
+		RUN apt-get install -y apache2
+		RUN apt-get install -y apache2-utils
+		RUN apt-get install -y vim
+		RUN apt-get clean
+
+	# option 2
+	RUN apt-get update \
+		&& apt-get install -y \
+		apache2 \
+		apache2-utils \
+		vim \
+		&& apt-get clean
+		&& rm -rf /var/lib/apt/lists* /tmp/* /var/tmp/*
+
+	EXPOSE 80
+	CMD ["apache2ctrl","-D","FOREGROUND"]
+
+	docker build --no-cache -t="webserver-small" .
+	docker histry webserver-small
+	docker run -d -p 80:80 webserver
+	docker stop webserver
+
+
+BuildCache
+	docker build -t="build1"
+	docker build -t="build2" (this happens faster because of build cache)
+	whats happing is that it is matching the layer images that it already has in its cache
+
+	docker build --no-cache -t="build with no cache"
 
 
 

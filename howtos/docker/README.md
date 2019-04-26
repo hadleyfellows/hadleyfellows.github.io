@@ -87,6 +87,8 @@ sudo su
 yum install docker
 systemctl status docker.service
 systemctl start docker.service
+systemctl daemon-reload
+systemctl restart docker
 docker -v
 docker version
 docker info
@@ -111,8 +113,19 @@ Links
 - https://github.com/docker/toolbox/releases/tag/v1.12.5
 - https://www.docker.com/products/docker-toolbox#/resources
 - https://docs.docker.com/docker-for-windows/install/#download-docker-for-windows
+- https://github.com/docker/toolbox/releases/tag/v1.12.5
+- https://www.docker.com/products/docker-toolbox#/resources
+- https://docs.docker.com/docker-for-windows/install/#download-docker-for-windows
+Install docker on windows virtual box
+```
+docker-machine rm default
+docker-machine create --driver virtualbox default
+docker-machine ip
+```
+
 #### Windows Containers
 Links
+- https://www.assistanz.com/installing-apache-web-server-in-windows-container-using-docker-file/
 - http://blogs.recneps.net/category/Windows-Containers
 - https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon
 - https://blogs.msdn.microsoft.com/jcorioland/2016/10/13/getting-started-with-windows-containers/
@@ -161,130 +174,129 @@ Troubleshoot:
 - Default installation docker is trying to start Linux VM with 2GB of RAM and apparently my hardware configuration wasn't satisfactory to this requirement. I am not certain this will resolve all outstanding issues, but finally getting prompt "Docker is running" was a good starting point.
 ## .dockerignore
 ## Docker Commandline
+Basic Commands to docker environment
 ```
+docker info
 docker-machine ip
+docker network (learn more)
+docker machine (learn more)
+docker swarm   (learn more)
+docker registry (Learn more) - like git bare repo
+```
+Docker images
+```
 docker images 
 docker images --tree
-docker info
-
+docker images --all
 docker pull <image alias>  (pulls images from docker hub to store locally)
-docker pull -a <image alias> 
-
-docker ps   (list of images currently running)
-docker ps -a (all images ran in the past)
-docker start <id or tag> (start the docker image)
-docker attach <id or tag> (attach to a specific container)
-docker top (shows top processes on image)
-docker inspect <image id or tag> (shows hardware details)
-
-docker run ubuntu /bin/bash -c "echo 'cool content' > /tmp/cool-file"
-docker run 
-	image tag or id : 
-		ubuntu (latest ubuntu)
-		ubuntu:14.04 (specific ubuntu version)
-	executable to run inside: /bin/bash 
-	command on boot: -c "echo 'cool content' > /tmp/cool-file"
-	run in background: -d
-	interactive allows us to log into the image: -it
-	control number of cpu shares:  --cpu-shares=256
-	control memory allocation: memory=1g^C
-	name the container --name=example1
-
-docker run -it ubuntu /bin/bash  (running docker in the foreground)
-	takes you into terminal on the ubuntu container
-	press CTRL+P+Q (detaches from the container)
-	docker stop <image id> (stops the docker image)
-	docker ps -l  (lists last run docker images)
-	docker rm <image id> (remmoves containers image, but we cannot remve a running container)
-docker start <image id> (start the docker image)
-docker attach <image id> (attach into docker image)
-docker restart <image id> (restarts docker image)
-docker top <image id> (shows the docker image processes from outside the container)
-	docker attach <image id>
-	ps -ef (shows processes from inside the docker container)
-docker logs <image id> 
-	-f to stream the logs
-docker inspect <image id> (a bunch of information on the image )
-	read from config.json and hsotConfig.json on our docker image
-	ie.
-	/var/lib/containers/<image id>/config.jon ..
-	
-ENTER THE DOCKER CONTAINER
-nsenter
-	- namespace enter
-	- requires container pid (found from docker inspect <image id> | grep pid)
-	ex.
-		nsenter -m -u -n -p -i -t <pid> /bin/bash
-			- mount namespace
-			- uts namespace
-			- network namespace
-			- process namespace
-			- ipc namespace
-			- target namespace
-			- process id
-docker-enter <image id> (enters the docker image)
-docker exec -it <image id> /bin/bash 
-
-
-image managment 
+docker pull -a <image alias>
 docker commit <image id> <tag> (creaes a new dcoker image)
 docker history <image id or tag>
 docker save -o /tmp/<id or tag>.tar <id or tag> (saves image)
 docker load -i /tmp/<id or tag>.tar (loads docker image)
 docker rmi <image id> (remmoves image, but we cannot remove a running container)
+```
+Docker containers
 
-Images build containers
+DOCKER CONTAINERS
+```
+docker ps   #(list of images currently running)
+docker ps -a #(all images ran in the past)
+docker ps -l #(lists last run docker images)
+docker ps -ef #(shows processes from inside the docker container)
+docker ps -a
+# To list all running and stopped containers
+docker ps -a -f status=running
+# To list all running containers (just stating the obvious and also example use of -f filtering option)
+docker ps -aq
+# To list all running and stopped containers, showing only their container id
+docker rm `docker ps -aq -f status=exited`
+# To remove all containers that are NOT running
+docker start <id or tag> #(start the docker image)
+docker attach <id or tag> #(attach to a specific container)
+docker run -it ubuntu /bin/bash  #(running docker in the foreground)
+# takes you into terminal on the ubuntu container
+# press CTRL+P+Q (detaches from the container)
+docker stop <image id> #(stops the docker image)
+docker top #(shows top processes on image)
+docker inspect <image id or tag> #(shows hardware details)
+docker run ubuntu /bin/bash -c "echo 'cool content' > /tmp/cool-file"
+docker rm <image id> #(remmoves containers image, but we cannot remve a running container)
+docker start <image id> #(start the docker image)
+docker attach <image id> #(attach into docker image)
+docker restart <image id> #(restarts docker image)
+docker top <image id> #(shows the docker image processes from outside the container)
+docker attach <image id>
+docker-enter <container id> #(enters the docker image)
+docker ps -ef #(shows processes from inside the docker container)
+docker logs <image id> 
+	-f to stream the logs
+docker inspect <image id> # (a bunch of information on the image )
+# read from config.json and hsotConfig.json on our docker image
+# /var/lib/containers/<image id>/config.jon ..
+docker-enter <image id> (enters the docker image)
+docker exec -it <image id> /bin/bash 
+docker exec -it <container id> /bin/bash #(access the image and execute commands)
+```
+Docker Run Example
+```
+docker run ubuntu:14.04 /bin/bash -c "echo 'cool content' > /tmp/cool-file"
+```
+ubuntu:14.04 - image tag or id (specific ubuntu version)
+/bin/bash (executable to run inside)
+-c "echo 'cool content' > /tmp/cool-file" (command on boot)
+-d (run in background)
+-it (interactive allows us to log into the image)
+--cpu-shares=256 (control number of cpu shares)
+memory=1g^C (control memory allocation)
+--name=example1 (name the container)
 
-cd to docker file
-docker-compose build (burns the dvd image) --no-cache (choose to not cache)
-docker-compose up (starts up container)
-docker exec -it <container id> /bin/bash (access the image and execute commands)
-docker image
-
-docker images (lists all docker images in docker cache *** need to run docker build to register docker images)
-docker run -it <docker image id> /bin/bash
-
-
-
-reads from docker-compose.yml
-
-docker-compose build
-docker-compose up
-docker-compose build node
-docker run -it dids_node /bin/bash
-
-
-docker network (learn more)
-docker machine (learn more)
-docker swarm   (learn more)
-docker registry (Learn more) - like git bare repo
-
-cd /c/home/dev/docker/dids; docker-compose build --no-cache node;
-
+nsenter
+- namespace enter
+- requires container pid (found from docker inspect <image id> | grep pid)
+ex.
+nsenter -m -u -n -p -i -t <pid> /bin/bash
+	- mount namespace
+	- uts namespace
+	- network namespace
+	- process namespace
+	- ipc namespace
+	- target namespace
+	- process id
+	
 DOCKER copy
+```
 docker cp [OPTIONS] CONTAINER:SRC_PATH DEST_PATH|-
 docker cp [OPTIONS] SRC_PATH|- CONTAINER:DEST_PATH
-
 docker cp src/. mycontainer:/target
 docker cp mycontainer:/src/. target
-
-
-
+```
 TAG IT AND BAG IT
+```
 docker tag ed94e1e75ab7 141.167.70.243:5000/fellowsh/tileserver:1.1	
 docker push 141.167.70.243:5000/fellowsh/tileserver:1.1
+```
 RUN CONTAINER IMAGE TO RESTART ALWAYS
+```
 docker run --name jenkins_master -d -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts --restart=always
-
-
-
+```
 DOCKER TROUBLESHOOT
 - build fails out of memory
+```
 docker rm $(docker ps -q -f 'status=exited')
 docker rmi $(docker images -q -f "dangling=true")
 ```
 ## Docker Compose
 ```
+docker-compose build (burns the dvd image) --no-cache (choose to not cache)
+docker-compose build --no-cache (choose to not cache)
+# - burns the dvd image
+# - reads from docker-compose.yml
+docker-compose up (starts up container)
+docker-compose build node
+docker-compose build --no-cache node
+docker run -it dids_node /bin/bash
+
 docker-compose build (burns the dvd image) --no-cache (choose to not cache)
 docker-compose up (starts up container)
 docker exec -it <container id> /bin/bash (access the image and execute commands)
@@ -635,159 +647,40 @@ BuildCache
 							vim /etc/default/docker
 								DOCKER_OPTS=--icc=true --iptables=false
 
-
-
-
-
-
-
-WINDOWS CONTAINERS 
-	APACHE
-		https://www.assistanz.com/installing-apache-web-server-in-windows-container-using-docker-file/
-	
   
-  
-  
-  
-  
-  NEW DOCKER README
-
-
 REPO GUIDE & HELPFUL LINKS
-	https://hub.docker.com/explore/
-	Install
-		windows - https://github.com/docker/toolbox/releases/tag/v1.12.5
-				- https://www.docker.com/products/docker-toolbox#/resources
-		linux   - https://docs.docker.com/docker-for-windows/install/#download-docker-for-windows
-
-DOCKER INSTALL
-	Install docker on windows
-		virtual box
-		docker-machine rm default
-		docker-machine create --driver virtualbox default
-		docker-machine ip
-	Install docker on ubuntu
-		https://docs.docker.com
-		- login as root
-		- service docker.io status
-		- apt-get update
-		- apt-get istall -y docker.io 
-		- service docker.io status
-		- docker -v 
-			docker client command asked docker daemon for the version
-		- docker version
-		- docker info
-			containers :
-			images :
-			...
-	Install docker on CentOS
-		- sudo su
-		- yum install docker
-		- systemctl status docker.service
-		- systemctl start docker.service
-			- systemctl daemon-reload
-			- systemctl restart docker
-		- docker -v
-		- docker version
-		- docker info
-	Updating Docker
-		- backup everything
-		- wget -qO- https://get.docker.com/gpg | apt-key add -
-		- echo deb http://get.docker.com/ubuntu docker main > /etc/apt/sources.list.d/docker.list
-		- apt-get install -y lxc-docker
-		- docker version
-
-
-
-DOCKER COMPOSE
-	docker-compose build --no-cache (choose to not cache)
-		- burns the dvd image
-		- reads from docker-compose.yml
-	docker-compose up 
-		- starts up container
-	docker exec -it <container id> /bin/bash 
-		- access the image and execute commands
-
-
-	docker-compose build
-	docker-compose up
-	docker-compose down
-	docker-compose build node
-	docker run -it dids_node /bin/bash
-	docker-compose logs
-
-DOCKER IMAGES
-	
-	docker images
-	docker images --all
-	docker rm <image id>
-	docker run -it <docker image id> /bin/bash
-
-
-DOCKER CONTAINERS
-	
-	docker ps
-	docker ps --all
-				docker attach <container id>
-				ps -ef (shows processes from inside the docker container)
-	docker-enter <container id> (enters the docker image)
-	docker exec -it <container id> /bin/bash 
-	docker rm <container id> (remmoves containers image, but we cannot remve a running container)
-	docker start <container id> (start the docker image)
-
-
-	docker ps -a
-		To list all running and stopped containers
-	docker ps -a -f status=running
-		To list all running containers (just stating the obvious and also example use of -f filtering option)
-	docker ps -aq
-		To list all running and stopped containers, showing only their container id
-	docker rm `docker ps -aq -f status=exited`
-		To remove all containers that are NOT running
-
-	
-
-
+https://hub.docker.com/explore/
 DOCKER REGISTRIES
-	Docker hub is a public registry /repo - repo holds docker images
-	
-	docker login
-	username:
-	password:
-	docker tag <image id> <server>/<username>/<repo>:<tag>
-		- docker tag 68a0826acdbc hado650/test:liquorapp
-		- docker push hado650/test:liquorapp
-		- docker pull hado650/test:liquorapp
+Docker hub is a public registry /repo - repo holds docker images
+docker login
+username:
+password:
+docker tag <image id> <server>/<username>/<repo>:<tag>
+	- docker tag 68a0826acdbc hado650/test:liquorapp
+	- docker push hado650/test:liquorapp
+	- docker pull hado650/test:liquorapp
 
 
-	Private Registry
-			*** NOTE on the pushing machine ***
-				* Ubuntu config
-					/etc/default/docker
-					DOCKER_OPTS="--insecure-registry host:5000"
-				* CentOS config
-					ExecStart=/usr/bin/docker -d $OPTIONS $DOCKER_STORAGE_OPTIONS --insecure-registry host:5000
-				* WINDOWS DOCKER VIRTUALBOX
-					SSH into your local docker VM. default is the name of the virtualbox
-						$ docker-machine ssh default					
-					ADD TO EXISTING OR END OF FILE
-						$ sudo vi /var/lib/boot2docker/profile											
-							EXTRA_ARGS="
-							--insecure-registry myserver.pathTo.registry1:5000
-							--insecure-registry myserver.pathTo.registry2:5000
-							--insecure-registry myserver.pathTo.registry3:5000
-							"
-					Save the profile changes and 'exit' out of the docker-machine bash back to your machine. Then Restart Docker VM substituting in your docker-machine name
-						$ docker-machine restart {machineName}
-						My Setup
-							docker-machine version : 0.6.0, build e27fb87
-							docker-machine driver : virtualbox
+Private Registry
+*** NOTE on the pushing machine ***
+* Ubuntu config
+	/etc/default/docker
+	DOCKER_OPTS="--insecure-registry host:5000"
+* CentOS config
+	ExecStart=/usr/bin/docker -d $OPTIONS $DOCKER_STORAGE_OPTIONS --insecure-registry host:5000
+* WINDOWS DOCKER VIRTUALBOX
+SSH into your local docker VM. default is the name of the virtualbox
+$ docker-machine ssh default					
+ADD TO EXISTING OR END OF FILE
+$ sudo vi /var/lib/boot2docker/profile											
+	EXTRA_ARGS="
+	--insecure-registry myserver.pathTo.registry1:5000
+	--insecure-registry myserver.pathTo.registry2:5000
+	--insecure-registry myserver.pathTo.registry3:5000
+	"
+Save the profile changes and 'exit' out of the docker-machine bash back to your machine. Then Restart Docker VM substituting in your docker-machine name
+$ docker-machine restart {machineName}
+My Setup
+	docker-machine version : 0.6.0, build e27fb87
+	docker-machine driver : virtualbox
 			
-
-
-
-
-
-
-
-  

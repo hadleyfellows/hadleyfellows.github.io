@@ -467,74 +467,78 @@ Volumes
 
 
 Dockerfile commands
-	FROM   - FROM ubuntu:15.04
-	ADD    - ADD example.tar.gz /
-	RUN    - RUN apt-get install -y apache2
-	EXPOSE - EXPOSE 80
-	CMD    - CMD ["apache2ctl", "-D", "FOREGROUND"]
-		   - CMD "echo", "Ello World"
-	ENTRYPOINT - ENTRYPOINT ["apache2ctl"]
-	ENV    - ENV var1=hado var2=fellows
-	VOLUME - VOLUME /data
-	WORKDIR - location of files on docker machine
-
-
+FROM   		- FROM ubuntu:15.04
+ADD    		- ADD example.tar.gz /
+RUN    		- RUN apt-get install -y apache2
+EXPOSE 		- EXPOSE 80
+CMD    		- CMD ["apache2ctl", "-D", "FOREGROUND"]
+		- CMD "echo", "Ello World"
+ENTRYPOINT 	- ENTRYPOINT ["apache2ctl"]
+ENV    		- ENV var1=hado var2=fellows
+VOLUME 		- VOLUME /data
+WORKDIR 	- location of files on docker machine
+```
 docker build -f node.dockerfile -t tageName .
 docker history <image layer id>
 docker info
 docker images-tree
-
+```
+```
+docker build --no-cache -t="webserver-small" .
+docker histry webserver-small
+docker run -d -p 80:80 webserver
+docker stop webserver
+```
 Ex. Dockerfile
-	#Ubuntu based Hello World container
-	FROM ubuntu:15.04 
-	MAINTAINER hadleysjobs@gmail.com
-	ADD example.tar.gz / 
-	RUN apt-get update
-	#RUN apt-get install -y nginx
-	#RUN apt-get install -y golang
-	CMD "echo","Hello World"
-
-
-	docker build -t helloworld:0.1 .
-		- the dot is the current directory
-		- -t is for tags
-
+```
+#Ubuntu based Hello World container
+FROM ubuntu:15.04 
+MAINTAINER hadleysjobs@gmail.com
+ADD example.tar.gz / 
+RUN apt-get update
+#RUN apt-get install -y nginx
+#RUN apt-get install -y golang
+CMD "echo","Hello World"
+```
+```
+docker build -t helloworld:0.1 .
+# the dot is the current directory
+# -t is for tags
+```
 Ex. Dockerfile 2
-	#web server example
-	FROM ubuntu:15.04 
-	MAINTAINER hadleysjobs@gmail.com
-	# option 1
-		RUN apt-get update
-		RUN apt-get install -y apache2
-		RUN apt-get install -y apache2-utils
-		RUN apt-get install -y vim
-		RUN apt-get clean
+```
+#web server example
+FROM ubuntu:15.04 
+MAINTAINER hadleysjobs@gmail.com
+# option 1
+	RUN apt-get update
+	RUN apt-get install -y apache2
+	RUN apt-get install -y apache2-utils
+	RUN apt-get install -y vim
+	RUN apt-get clean
 
-	# option 2
-	RUN apt-get update \
-		&& apt-get install -y \
-		apache2 \
-		apache2-utils \
-		vim \
-		&& apt-get clean
-		&& rm -rf /var/lib/apt/lists* /tmp/* /var/tmp/*
+# option 2
+RUN apt-get update \
+	&& apt-get install -y \
+	apache2 \
+	apache2-utils \
+	vim \
+	&& apt-get clean
+	&& rm -rf /var/lib/apt/lists* /tmp/* /var/tmp/*
 
-	EXPOSE 80
-	CMD ["apache2ctrl","-D","FOREGROUND"]
-
-	docker build --no-cache -t="webserver-small" .
-	docker histry webserver-small
-	docker run -d -p 80:80 webserver
-	docker stop webserver
-
+EXPOSE 80
+CMD ["apache2ctrl","-D","FOREGROUND"]
+```
 
 BuildCache
-	docker build -t="build1"
-	docker build -t="build2" (this happens faster because of build cache)
-	whats happing is that it is matching the layer images that it already has in its cache
+whats happing is that it is matching the layer images that it already has in its cache
+```
+docker build -t="build1"
+docker build -t="build2" (this happens faster because of build cache)
+docker build --no-cache -t="build with no cache"
+```
 
-	docker build --no-cache -t="build with no cache"
-
+	
 
 
 

@@ -13,6 +13,10 @@
 - [Container Concepts](#container-concepts)
 - [Docker Registry](#docker-registry)
 - [Dockerfile](#dockerfile)
+- [Docker Network](#docker-network)
+- [Docker Logging](#docker-logging)
+- [Docker Firewall](#docker-firewall)
+
 ## Installation
 ### Linux Installation
 Links
@@ -347,99 +351,85 @@ Layer images
 	bootfs
 		- a layer image that only exists during boot of docker
 ## Docker Registry
-REPO GUIDE
-https://hub.docker.com/explore/
-- initialize registry
-	docker run -d -p 5000:5000 registry				
+By default docker images are pulled from Docker Hub (https://hub.docker.com/explore/)
+Docker Hub is the github for docker containers.
+Private registries are used to store private images.
+Initialize registry
+*** Ubuntu config
+/etc/default/docker
+DOCKER_OPTS="--insecure-registry host:5000"
+*** CentOS config
+ExecStart=/usr/bin/docker -d $OPTIONS $DOCKER_STORAGE_OPTIONS --insecure-registry host:5000
+*** WINDOWS DOCKER VIRTUALBOX
+SSH into your local docker VM. default is the name of the virtualbox
+$ docker-machine ssh default					
+ADD TO EXISTING OR END OF FILE
+$ sudo vi /var/lib/boot2docker/profile											
+EXTRA_ARGS="
+--insecure-registry myserver.pathTo.registry1:5000
+--insecure-registry myserver.pathTo.registry2:5000
+--insecure-registry myserver.pathTo.registry3:5000
+"
+Save the profile changes and 'exit' out of the docker-machine bash back to your machine. Then Restart Docker VM substituting in your docker-machine name
+$ docker-machine restart {machineName}
+```
+docker run -d -p 5000:5000 registry				
+```
+Push to private registry (may need to add registry to insecure registries if not using ssl)
+```
+docker tag <image id> host:5000/priv-test:1.1
+docker push host:5000/priv-test:1.1
 
-- push to private registry
-	docker tag <image id> host:5000/priv-test:1.1
-	docker push host:5000/priv-test:1.1
-
-- pull from private registry
-	docker pull localhost:5000/priv-test:1.1
-	docker run -d hot:5000/priv-test
-DockerHub
-	- registered images or repos 
-	- the github of docker
-	registry.hub.docker.com
-
-Registries (repo for docker images)
-- Docker hub is a public registry /repo
-- a registry / repo holds docker images
-- push image to docker registry/repo
-	docker tag <iamge id> <repo name>
-	docker push <repo name>
-	<repo name> = fellows/example1
-	docker tag 2ui4ui5ij6667u fellows/example1
-	docker push fellows/example1
-
-	login and presto
-- pull images from docker registry
-	docker pull <repo name>
-	<repo name> = fellows/example1
-	docker tag 2ui4ui5ij6667u fellows/example1
-	docker pull fellows/example1
-- private registry
-	*** NOTE ***
-	* Ubuntu config
-		/etc/default/docker
-		DOCKER_OPTS="--insecure-registry host:5000"
-	* CentOS config
-	ExecStart=/usr/bin/docker -d $OPTIONS $DOCKER_STORAGE_OPTIONS --insecure-registry host:5000
-
-	- initialize registry
-		docker run -d -p 5000:5000 registry				
-
-	- push to private registry
-		docker tag <image id> host:5000/priv-test
-		docker push host:5000/priv-test
-
-	- pull from private registry
-		docker run -d hot:5000/priv-test
-
-
-
-
-
+docker tag <iamge id> <repo name>
+docker push <repo name>
+<repo name> = fellows/example1
+docker tag 2ui4ui5ij6667u fellows/example1
+docker push fellows/example1
+```
+Pull from private registry
+```
+docker pull localhost:5000/priv-test:1.1
+docker run -d hot:5000/priv-test
+```
 ## Dockerfile
 - set of instructions onhow to build an image
 - when building a docker image from Dockerfile all files and directories will be included into the build
 - always start with FROM an image
 - MAINTAINER email address
 RUN
-	- every RUN creates a new layer in our docker image
-	- RUN is a build time command
+- every RUN creates a new layer in our docker image
+- RUN is a build time command
 CMD
-	- CMD is a run-time command
-	- CMD only one command per Dockerfile
-	- CMD executes everytime the docker image starts
-	- can run shell form or array form ["echo","hello world"]
+- CMD is a run-time command
+- CMD only one command per Dockerfile
+- CMD executes everytime the docker image starts
+- can run shell form or array form ["echo","hello world"]
 ENTRYPOINT
-	- can use --entrypoint
-	- can't be overwritten at run time
-	- takes parameters from command line or CMD command and interret them at runtime
-	ex. 
-		FROM ubuntu:15.04 
-		MAINTAINER hadleysjobs@gmail.com
-		ADD example.tar.gz / 
-		RUN apt-get update
-		#RUN apt-get install -y nginx
-		#RUN apt-get install -y golang
-		CMD echo $var1
-		ENTRYPOINT ["echo"]
-	# This will echo any paramters passed in at
-	$ docker build -t="hw2" . 
-	$ docker run hw2 hellooooo there!
-	$ helloooooo there!
-	$ docker run -it hw2 /bin/bash
-	$ /bin/bash
-		FROM ubuntu:15.04
-		RUN apt-get update && apt-get install -y iputils-ping
-		ENTRYPOINT ["apache2ctl"]
-	$ docker build -t="web2" .
-	$ docker run -d -p 80:80 web2 -D FOREGROUND
-
+can use --entrypoint
+can't be overwritten at run time
+takes parameters from command line or CMD command and interret them at runtime
+ex. 
+	FROM ubuntu:15.04 
+	MAINTAINER hadleysjobs@gmail.com
+	ADD example.tar.gz / 
+	RUN apt-get update
+	#RUN apt-get install -y nginx
+	#RUN apt-get install -y golang
+	CMD echo $var1
+	ENTRYPOINT ["echo"]
+```
+# This will echo any paramters passed in at
+$ docker build -t="hw2" . 
+$ docker run hw2 hellooooo there!
+$ helloooooo there!
+$ docker run -it hw2 /bin/bash
+$ /bin/bash
+	FROM ubuntu:15.04
+	RUN apt-get update && apt-get install -y iputils-ping
+	ENTRYPOINT ["apache2ctl"]
+$ docker build -t="web2" .
+$ docker run -d -p 80:80 web2 -D FOREGROUND
+```
 ENV
 ENV    - ENV var1=hado var2=fellows
 	ex. 
@@ -537,154 +527,105 @@ docker build -t="build1"
 docker build -t="build2" (this happens faster because of build cache)
 docker build --no-cache -t="build with no cache"
 ```
+## Docker Network
+look at the networking stack
+```
+ps a
+```
+returns network config
+1. lo: <LOOPBACK,UP,LOWR_UP>
+2. eth0: <BROADCAST,MULTICAST,UP,LOWER_UP>
+3. eth1: <BROADCAST,MULTICAST,UP,LOWER_UP>
+4. docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP>
+5. docker0: a host network bridge or ethernet switch
+```
+apt-get install bridge-utils
+yum install bridge-utils
+brctl show docker0
+```
+As you start containers you will see an interface per container
+```
+ip link del docker0
+vim /etc/default/docker
+DOCKER_OPTS=--bip=<ip>/24
+ip a
+$ docker attach container 1
+$ ip a
+```
+Should return
+1. lo: <LOOPBACK,UP,LOWR_UP>
+2. eth0: <BROADCAST,MULTICAST,UP,LOWER_UP>
+```
+$ ping 8.8.8.8
+$ traceroute 8.8.8.8
+```
+1 172.17.42.1 (172.17.42.1) 0.04 ms 0.013 ms 0.011 ms
+This is our gateway to the internet 172.17.42.1
+vethx <<<<=====================>>>> eth0
+(docker host namespace)		(Container namespace)
+Look at the network settings under NetworkSettings {} when running:
+```
+$ docker inspect
+```		
+Docker container networking files are located in
+/var/lib/docker/containers/<container id>
+	hosts
+	resolv.conf
+Every resolv.conf is a copy of the docker host's resolv.conf
+```
+$ docker run --dns=8.8.4.4 --name=dnstest net-img
+$docker run -d -p 5001:80
+```
+This commadn maps port 5001 in our docker machine/host to port 80 on our docker container
+```
+$ docker port <container name>
+#	by default tcp but you can use udp
+$docker run -d -p 5001:80/udp --name=web2 apache-img
+$docker run -d -p <ip>.5001:80/udp --name=web3 apache-img
+$docker run -d -p <ip>.5001:80/udp --name=web3 apache-img
+$docker run -d -P --name=web3 apache-img
+#	- -P exposes all ports that are marked as exposed in the container files
+```
+Linking Containers
+OPTION 1
+```
+source container port 80 is exposed
+doker run --name=src -d img
+doker run --name=receiver --link=src:<alias> -it ubuntu /bin/bash
+	- inside the reciever image
+	- env | grep <alias>
+	- we can use src container using the env variables set by --link
+```
+OPTION 2
+```
+docker network create --drive bridge isolated_network
+docker run -d --net=isolated_network --name mongodbNAME mongo
+docker run -d --net=isolated_network --name nodeapp -p 3000:3000
+```
+## Docker Logging
+```
+docker -d -l debug &
+docker -d -l debug (error, debug, fatal, info) | error (error and fatal) | info (error, fatal, info) | fatal
+vim /etc/default/docker
+DOCKER_OPTS="--log-level=fatal"
+# restart docker service and booo ya
+docker logs
+```
+Test docker builds by creating a base container of say ubuntu and then run all the Dockerfile commands in the image
 
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-------------------------------------
-
-
-
-		docker networks
-			1. look at the networking stack
-				ps a
-				returns network config
-					1: lo: <LOOPBACK,UP,LOWR_UP>
-					2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP>
-					3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP>
-					4: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP>
-			2. docker0
-				a host network bridge or ethernet switch
-				apt-get install bridge-utils
-				yum install bridge-utils
-
-				$ brctl show docker0
-				As you start containers you will see an interface per container
-				$ docker attach container 1
-				$ ip a
-					1: lo: <LOOPBACK,UP,LOWR_UP>
-					2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP>
-				$ ping 8.8.8.8
-				$ traceroute 8.8.8.8
-					1 172.17.42.1 (172.17.42.1) 0.04 ms 0.013 ms 0.011 ms
-					2 ...
-				This is our gateway to the internet 172.17.42.1
-
-				vethx <<<<=====================>>>> eth0
-				(docker host namespace)				(Container namespace)
-
-				$ docker inspect
-					shows NetworkSettings {}
-
-				network files for Containers
-					/var/lib/docker/containers/<container id>
-					hosts
-					resolv.conf
-
-				every resolv.conf is a copy of the docker host's resolv.conf
-
-				$ docker run --dns=8.8.4.4 --name=dnstest net-img
-				$docker run -d -p 5001:80
-					- map port 5001 in our docker machine/host to port 80 on our docker container
-
-				$ docker port <container name>
-					by default tcp but you can use udp
-				$docker run -d -p 5001:80/udp --name=web2 apache-img
-				$docker run -d -p <ip>.5001:80/udp --name=web3 apache-img
-				$docker run -d -p <ip>.5001:80/udp --name=web3 apache-img
-				$docker run -d -P --name=web3 apache-img
-					- -P exposes all ports that are marked as exposed in the container files
-
-				LINKING CONTAINERS
-					OPTION 1
-						source container
-							port 80 is exposed
-						doker run --name=src -d img
-						doker run --name=receiver --link=src:<alias> -it ubuntu /bin/bash
-							- inside the reciever image
-							- env | grep <alias>
-							- we can use src container using the env variables set by --link
-					OPTION 2
-						docker network create --drive bridge isolated_network
-						docker run -d --net=isolated_network --name mongodbNAME mongo
-						docker run -d --net=isolated_network --name nodeapp -p 3000:3000
-
-				TROUBLESHOOTING
-
-				PEMZN-SFGWT-CZYG9-L4QTJ-FMAME
-
-					DOCKER SERVICE LOGGING
-						docker -d -l debug &
-						docker -d -l debug (error, debug, fatal, info) | error (error and fatal) | info (error, fatal, info) | fatal 
-						
-						vim /etc/default/docker
-						DOCKER_OPTS="--log-level=fatal"
-						restart docker service and booo ya
-					DOCKER CONTAINER LOGGING
-						docker logs
-					DOCKER IMAGES
-						test docker builds by creating a base container of say ubuntu and then run all the Dockerfile commands in the image
-					DOCKER NETWORK
-						ip link del docker0
-						vim /etc/default/docker
-						DOCKER_OPTS=--bip=<ip>/24
-						ip a
-					FIREWALL ON DOCKER HOST
-						--icc=true (default)
-							inter-container communication
-							iptables -L -v
-							vim /etc/default/docker
-								DOCKER_OPTS=--icc=false
-						--iptables= 
-							determines whether docker will make mods to iptables
-							vim /etc/default/docker
-								DOCKER_OPTS=--icc=true --iptables=false
-
-  
-REPO GUIDE & HELPFUL LINKS
-https://hub.docker.com/explore/
-DOCKER REGISTRIES
-Docker hub is a public registry /repo - repo holds docker images
-docker login
-username:
-password:
-docker tag <image id> <server>/<username>/<repo>:<tag>
-	- docker tag 68a0826acdbc hado650/test:liquorapp
-	- docker push hado650/test:liquorapp
-	- docker pull hado650/test:liquorapp
+## Docker Firewall
+Inter-container communication
+```
+--icc=true (default)
+iptables -L -v
+vim /etc/default/docker
+DOCKER_OPTS=--icc=false
+```
+determines whether docker will make mods to iptables
+```
+--iptables=true
+vim /etc/default/docker
+DOCKER_OPTS=--icc=true --iptables=false
+```
 
 
-Private Registry
-*** NOTE on the pushing machine ***
-* Ubuntu config
-	/etc/default/docker
-	DOCKER_OPTS="--insecure-registry host:5000"
-* CentOS config
-	ExecStart=/usr/bin/docker -d $OPTIONS $DOCKER_STORAGE_OPTIONS --insecure-registry host:5000
-* WINDOWS DOCKER VIRTUALBOX
-SSH into your local docker VM. default is the name of the virtualbox
-$ docker-machine ssh default					
-ADD TO EXISTING OR END OF FILE
-$ sudo vi /var/lib/boot2docker/profile											
-	EXTRA_ARGS="
-	--insecure-registry myserver.pathTo.registry1:5000
-	--insecure-registry myserver.pathTo.registry2:5000
-	--insecure-registry myserver.pathTo.registry3:5000
-	"
-Save the profile changes and 'exit' out of the docker-machine bash back to your machine. Then Restart Docker VM substituting in your docker-machine name
-$ docker-machine restart {machineName}
-My Setup
-	docker-machine version : 0.6.0, build e27fb87
-	docker-machine driver : virtualbox
-			
